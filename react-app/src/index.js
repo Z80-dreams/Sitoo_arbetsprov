@@ -8,3 +8,22 @@
    I will also try to write code for immutable date, and then only change 
    the data through the API.
 */
+Class Users extends React.Component {
+    constructor(props) {
+	super(props); 
+	// Get user data and populate state
+	this.state = {
+	};
+    }
+
+    render() {
+	return() // All the JSX goes in here.
+    }
+    
+
+    
+}
+
+// ========================================
+
+ReactDOM.render(<Users>, document.getElementById("root"));
