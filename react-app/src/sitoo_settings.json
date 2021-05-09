@@ -1,0 +1,10 @@
+{
+  "siteId": "1",
+  "apiId": "90316-125",
+  "apiPsw": "pfX0Y7A2TYAlZ571IKEO7AKoXza6YlvsP8kKvAu3",
+  "apiBaseUrl": "https://api-sandbox.mysitoo.com/v2/accounts/90316/",
+  "corsServer": true,
+  "corsUrl": "http://127.0.0.1",
+  "corsPort": "8088",
+  "maxUsersPerGet": 50
+}
