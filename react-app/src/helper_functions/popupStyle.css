@@ -1,0 +1,55 @@
+/* 
+   This cascading style sheet sets the style for the popup.
+   It's designed for mobile first.
+*/
+
+.shadowBox {
+    position: fixed;
+    background: #00000050;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.popupBox {
+    position: relative;
+    width: 95vw;
+    height: auto;
+    background: #FFF;
+    border-radius: 9px;
+    margin: 8vh auto 2vh;
+    padding: 0.5vh;
+    border: 1px solid #999;
+    overflow: visable;
+}
+
+.closeButton {
+    position: absolute;
+    right: 5px;
+    top: -25px;
+    text-align: center;
+    background: #C00;
+    color: #FFF;
+    font-family: sans-serif;
+    font-weight: bold;
+    border: 1px solid #999;
+    padding: 0.5em;
+    border-radius: 1em;
+    z-index: 100;
+}
+
+
+ @media only screen and (min-width: 768px) {
+     .popupBox {    
+	 width: 40vw;
+     }
+
+     .closeButton {
+	 position: absolute;
+	 right: -10px;
+	 top: -5px;
+	 
+	 
+     }
+ }

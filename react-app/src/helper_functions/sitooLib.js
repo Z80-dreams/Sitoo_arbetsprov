@@ -16,7 +16,7 @@ const btoa = require("btoa");
 const settings = require("../sitoo_settings.json");
 //==========================================================================================================
 
-const setUrl = () => settings.corsServer ? url = settings.corsUrl + ":" + settings.corsPort + "/" + settings.apiBaseUrl : url = settings.apiBaseUrl ; 
+const setUrl = () => settings.corsServer ? settings.corsUrl + ":" + settings.corsPort + "/" + settings.apiBaseUrl : settings.apiBaseUrl ; 
 
 /* Base function for GET, PUT and POST, so that I don't have to write the error checking code for each type of user data */
 const httpGet = async function(urlstring) {
@@ -78,8 +78,8 @@ const getUser = async function(userid) {
 };
 
 
-const getUsers = async function() {
-    return await httpGet(setUrl() + 'sites/' + settings.siteId + '/users.json?num=' + settings.maxUsersPerGet);
+const getUsers = async function(maxUsersToGet) {
+    return await httpGet(setUrl() + 'sites/' + settings.siteId + '/users.json?num=' + maxUsersToGet);
 }
 
 
@@ -101,8 +101,8 @@ const addUsers = async function(userobjects) {
 }
 
 // uncomment below when testing on web server.
-// export default {getUser, getUsers, updateUser, updateUsers, deleteUser, addUsers}
+export {getUser, getUsers, updateUser, updateUsers, deleteUser, addUsers};
 // Below is just used for testing in node.js, comment when testing on web server.
-module.exports =  {getUser, getUsers, updateUser, updateUsers, deleteUser, addUsers}
+// module.exports =  {getUser, getUsers, updateUser, updateUsers, deleteUser, addUsers}
 
 

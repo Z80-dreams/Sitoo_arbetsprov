@@ -8,16 +8,18 @@
    I will also try to write code for immutable date, and then only change 
    the data through the API.
 */
-import React from 'react';
+import React, { Component, Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery'; 
 import logo from './site-logo.svg';
 import './main-style.css';
+import * as helper from './helper_functions/guiComponents.js';
 
 // Installed modules that lives in other files.
-import Users from './pos_modules/usersmodule.js';
-import Vendors from './pos_modules/vendorsmodule.js';
-import Products from './pos_modules/productsmodule.js';
+const Users = lazy (() => import('./pos_modules/usersmodule.js'));
+const Vendors = lazy (() => import('./pos_modules/vendorsmodule.js'));
+const Products = lazy (() => import('./pos_modules/productsmodule.js'));
+
 
 /* 
    This class renders the main wisdow. It also keeps track of which modules are installed and which one is loaded.
@@ -32,13 +34,13 @@ class Window extends React.Component {
 	this.state = {
 	    installedModules: [{
 		name: 'Users',
-		module: Users,
+		module: <Users />,
 	    },{
 		name: 'Products',
-		module: Products,
+		module: <Products />,
 	    },{
 		name: 'Manufacturers',
-		module: Vendors,
+		module: <Vendors />,
 	    }],
 
 	    loadedModule: 0,
@@ -56,15 +58,17 @@ class Window extends React.Component {
     }
 
     render() {
+	let mainContent = [this.state.installedModules[this.state.loadedModule].module];
 	return(
 	    <div className='app-window'>
 		<header className='app-header'>
 		    <img src={logo} alt='site logo' className='app-logo'/>
-		    
 		</header>
 		{this.NavBuilder()}
 		<main>
-		    {new this.state.installedModules[this.state.loadedModule].module().render()} 
+		    <Suspense fallback={<div>Loading...</div>}>
+			{this.state.installedModules[this.state.loadedModule].module}
+		    </Suspense>
 		</main>
 	    </div>
 	); 

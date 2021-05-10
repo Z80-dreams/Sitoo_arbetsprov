@@ -2,10 +2,13 @@
    This is the main CSS file. Here I fill add styles to make flexbox work for the navbar, 
    the table of users, the buttons, etc. 
 */
+
+
 .app-window {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
+    height: 100vh;
 }
 
 
@@ -50,16 +53,26 @@ button.main-navbar {
     border-width: 0;
     color: #848484;
     width: 100%;
+    font-family: sans-serif;
+}
+
+button.main-navbar:hover {
+    background-color: #000;
+    color: #FFF;
+    font-weight: bold;
 }
 
 button.main-navbar.selected {
     background-color: #000;
-    padding: 1em;
-    margin: 0;
-    border-width: 0;
     color: #FFF;
     font-weight: bold;
-    font-family: sans-serif;
+}
+
+main {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    height: 100%
 }
 
 @media only screen and (min-width: 768px) {

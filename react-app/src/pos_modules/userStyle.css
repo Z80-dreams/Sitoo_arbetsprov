@@ -1,0 +1,129 @@
+/* Toolbar buttons below */
+div.installedFunctions {
+    background: #F5F5F5;
+    margin: 0;
+    padding: 0.2vh;
+}
+ul.installedFunctions {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+}
+
+li.installedFunctions {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    width: 100vw;
+}
+
+button.installedFunctions {
+    padding: 0.7em;
+    margin: 3px;
+    border-width: 1px;
+    font-weight: bold;
+    font-family: sanf-serif;
+    color: #FFF;
+    width: 100%;
+    border-radius: 10px;
+    border-style: solid;
+}
+
+button.installedFunctions.blue {
+    background: #3F8ABC;
+    border-color: #2b5f81;
+}
+
+button.installedFunctions.red {
+    background: #DE5148;
+    border-color: #aa3d37;
+}
+
+button.installedFunctions.blue:hover {
+    background: #2b5f81;
+}
+
+button.installedFunctions.red:hover {
+    background: #aa3d37;
+}
+
+@media only screen and (min-width: 768px) {
+    ul.installedFunctions {
+	flex-direction: row;
+	justify-content: space-between;
+    }
+
+    li.installedFunctions {
+	width: auto;
+    }
+    button.installedFunctions {
+	width: auto;
+    }
+}
+
+/* Page scroll buttons below */
+
+div.tableScrollButtons {
+    background: #FFF;
+    margin: 0;
+    padding: 0.5vh;
+}
+
+ul.tableScrollButtons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+li.tableScrollButtons {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+   
+}
+
+button.tableScrollButtons {
+    width: 3em;
+    height: 3em;
+    border: solid #2b5f81;
+    border-width: 1px 0px;
+    font-family: sans-serif;
+    font-weight: bold;
+    color: #2b5f81;
+
+
+	
+}
+
+button.tableScrollButtons:hover {
+    background: #2b5f81;
+    color: #FFF;
+}
+
+button.tableScrollButtons.left {
+    border-left: 1px solid;
+    border-radius: 1.2em 0 0 1.2em;
+}
+
+button.tableScrollButtons.right {
+    border-right: 1px solid;
+    border-radius: 0 1.2em 1.2em 0;
+}
+
+
+
+button.tableScrollButtons.selected {
+    background: #2b5f81;
+    color: #FFF;
+}
+
+/* Here comes table stuff */
+
+td.userTable {
+    height: 2em;
+}
