@@ -12,7 +12,7 @@ export {popupForm, showError, showSuccess};
 
 const popupForm = (props) => {
     return(
-	<div className='shadowBox'>
+	<div className='shadowBox hidden'>
 	    <div className='popupBox'>
 		<button className='closeButton' onClick={props.closeHandle}>Close</button>
 		<h2>{props.title}</h2>

@@ -1,3 +1,9 @@
+div.bottomstuff {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
 /* Toolbar buttons below */
 div.installedFunctions {
     background: #F5F5F5;
@@ -124,6 +130,45 @@ button.tableScrollButtons.selected {
 
 /* Here comes table stuff */
 
-td.userTable {
-    height: 2em;
+.usersTable {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-spacing: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: sans-serif;
 }
+
+table.usersTable {
+    width: 100%;
+    max-width: 70em;
+
+}
+
+th.usersTable {
+    padding: 1px;
+    max-height: 1em;
+    text-align: left;
+    background: #F7F7F7;
+    color: #000;
+    font-weight: bold;
+
+}
+td.usersTable {
+    padding: 1px;
+    max-height: 1em;
+    color: #000;
+}
+
+td.usersTable.time {
+    color: #777;
+}
+
+.usersTable.date {
+    text-align: right;
+}
+
+

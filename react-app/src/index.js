@@ -61,10 +61,12 @@ class Window extends React.Component {
 	let mainContent = [this.state.installedModules[this.state.loadedModule].module];
 	return(
 	    <div className='app-window'>
-		<header className='app-header'>
-		    <img src={logo} alt='site logo' className='app-logo'/>
-		</header>
-		{this.NavBuilder()}
+		<div className="topstuff">
+		    <header className='app-header'>
+			<img src={logo} alt='site logo' className='app-logo'/>
+		    </header>
+		    {this.NavBuilder()}
+		</div>
 		<main>
 		    <Suspense fallback={<div>Loading...</div>}>
 			{this.state.installedModules[this.state.loadedModule].module}
