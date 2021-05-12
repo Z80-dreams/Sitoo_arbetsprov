@@ -14,6 +14,7 @@ import $ from 'jquery';
 // Home made helper libraries
 import * as helper from './../helper_functions/guiComponents.js';
 import * as sitooApi from './../helper_functions/sitooLib.js';
+import addUser from './addUser.js';
 import './userStyle.css';
 
 export default class Users extends React.Component {
@@ -37,6 +38,7 @@ export default class Users extends React.Component {
 	    numberOfPages: 1, // Set to 1 initially, then change state once all entries has been loaded from the API, and the actual length is known.
 	    usersPerPage: 1,
 	    checkedUsers: [],
+	    messageStack: [],
 
 
 	    
@@ -58,7 +60,8 @@ export default class Users extends React.Component {
 	// This is to select the first button on startup.
 	this.changePage(1);
 	
-
+	//helper.showSuccess("Testing a green box!", this.addMsg);
+	//helper.showAlert("Testing a red box!", this.addMsg);
 	
     }
 
@@ -68,50 +71,20 @@ export default class Users extends React.Component {
 	    $('button.tableScrollButtons').removeClass('selected');
 	    $('button.tableScrollButtons.' + this.state.currentPage).addClass('selected');
 	});
+	
+	// Run function to calculate number of pages needed.
+	this.checkNumberOfPages();
 
-	// Checking if the number of rows that fits in one page of the table has changed since last render.
-	let windowHeight = ($(window).innerHeight() || 500);
-	let rowHeight = ($('td.usersTable').first().outerHeight(true) || 27);
-	let tableHeaderHeight = ($('th.usersTable').first().outerHeight(true) || 25);
-	let toolboxHeight = ($('div.installedFunctions').first().outerHeight(true) || 50);
-	let scrollButtonsHeight = ($('div.tableScrollButtons').first().outerHeight(true) || 50);
-	let headerHeight = ($('header').first().outerHeight(true) || 50);
-	let menuHeight = ($('nav').first().outerHeight(true) || 50);
-	
-	//Calculating how much space I have, how many rows fit in one page, and how many pages are needed.
-	let mainHeight = windowHeight - headerHeight - menuHeight;
-	// Set main tag to available space.
-	$('main').height(mainHeight);
-	// Calcualte available Space
-	let availableHeight = mainHeight - scrollButtonsHeight - toolboxHeight - tableHeaderHeight;
-	let numRows = Math.floor(availableHeight / rowHeight) - 1;
-        // Make sure we don't get negative number of rows.
-	if (numRows < 0) {
-	    numRows = 0
-	} 
-	let numPages = Math.floor(this.state.users.length / numRows) + 1;
+	// If we notice that data loaded-flag is set to false, we try to reload the last known users count.
+	if(!this.state.dataLoaded)
+	    this.loadUsersIntoState(this.state.userscount);
+	    
 
-	
-	
-	/* 
-	   If numPages matches the current state, setState is not called. This lowers the render-cycles.
-	   Without this if statement we would end up with an infinite loop of renders, as render() is automatically
-	   called when satate changes, and componentDidUpdate()-hook is called after each render-cycle. 
-	   I only need to check numPages, as usersPerPage will update that variable as well. In testing about 5 render cycles
-	   are needed before all properties are set correctly. Each render cycle takes around 200 ms in testing. 
-	*/
-	if (numPages !== this.state.numberOfPages)
-	    this.setState({numberOfPages: numPages,
-			   usersPerPage: numRows,
-			  });
-
-	
 	
 	// Uncomment below to get data about rendering times. Don't forget to uncomment array renderTime in state. 
 	// this.state.renderTime.push(new Date);
 	// console.log("Rendering took " + (this.state.renderTime[this.state.renderTime.length-1] - this.state.renderTime[this.state.renderTime.length-2]) + " milliseconds.");
 	// console.log("Total time spend is " + (this.state.renderTime[this.state.renderTime.length-1] - this.state.renderTime[0]) + " milliseconds.");
-
 
     }
 
@@ -156,11 +129,12 @@ export default class Users extends React.Component {
 			
 		    </table>
 		    <div className="bottomstuff">
-			<TableScrollButtons numOfPages={this.state.numberOfPages} currentPage={this.state.currentPage} callbackFunc={this.changePage} />
+			<TableScrollButtons numberOfPages={this.state.numberOfPages} currentPage={this.state.currentPage} callbackFunc={this.changePage} />
 			<FuncButtons functions={this.state.installedFuncs} openHandle={(i) => {
 					 this.setState({loadedFunction: i})}} />
 		    </div>
-		    <InstalledPopups functions={this.state.installedFuncs} loadedFunction={this.state.loadedFunction} closeHandle={() => {this.setState({loadedFunction: 0})}} users={this.state.users} checkedUsers={this.state.checkedUsers}/>
+		    <InstalledPopups functions={this.state.installedFuncs} loadedFunction={this.state.loadedFunction} closeHandle={() => {this.setState({loadedFunction: 0})}} users={this.state.users} checkedUsers={this.state.checkedUsers} handleDataloading={() => {this.setState({dataLoaded: false})}} addMessage={this.addMsg} />
+		    <helper.Messages messages={this.state.messageStack} removeMsg={this.removeMsg} />
 		    
 		</>	
 	    );
@@ -168,7 +142,10 @@ export default class Users extends React.Component {
 	}
 	else {
 	    return (
-		<strong>Loading...</strong>
+		<>
+		    Trying to connect for 5 minutes in Chrome, 1.5 minutes in Firefox.<br/>
+		    <strong>Loading Users Data...</strong>
+		</>
 	    );
 	}
     }
@@ -179,11 +156,66 @@ export default class Users extends React.Component {
      *                                                                       *
      *************************************************************************/
 
+    checkNumberOfPages = () => {
+	// Checking if the number of rows that fits in one page of the table has changed since last render.
+	let windowHeight = ($(window).innerHeight() || 500);
+	let rowHeight = ($('td.usersTable').first().outerHeight(true) || 27);
+	let tableHeaderHeight = ($('th.usersTable').first().outerHeight(true) || 25);
+	let toolboxHeight = ($('div.installedFunctions').first().outerHeight(true) || 50);
+	let scrollButtonsHeight = ($('div.tableScrollButtons').first().outerHeight(true) || 50);
+	let headerHeight = ($('header').first().outerHeight(true) || 50);
+	let menuHeight = ($('nav').first().outerHeight(true) || 50);
+	
+	//Calculating how much space I have, how many rows fit in one page, and how many pages are needed.
+	let mainHeight = windowHeight - headerHeight - menuHeight;
+	// Set main tag to available space.
+	if (mainHeight > 0) {
+	    $('main').height(mainHeight);
+	}
+	// Calcualte available Space
+	let availableHeight = mainHeight - scrollButtonsHeight - toolboxHeight - tableHeaderHeight;
+	let numRows = Math.floor(availableHeight / rowHeight) - 1;
+        // Make sure we don't get negative or 0 number of rows. We don't want division by 0.
+	if (numRows < 0) 
+	    numRows = 1;
+	
+	let numPages = Math.floor(this.state.users.length / numRows) + 1;
+
+	// Make sure we get at least one. 
+	if (numPages < 1)
+	    numPages = 1;
+
+
+
+	/* 
+	   If numPages matches the current state, setState is not called. This lowers the render-cycles.
+	   Without this if statement we would end up with an infinite loop of renders, as render() is automatically
+	   called when satate changes, and componentDidUpdate()-hook is called after each render-cycle. 
+	   I only need to check numPages, as usersPerPage will update that variable as well. In testing about 5 render cycles
+	   are needed before all properties are set correctly. Each render cycle takes around 200 ms in testing. 
+	*/
+	if (numPages !== this.state.numberOfPages)
+	    this.setState({numberOfPages: numPages,
+			   usersPerPage: numRows,
+			  });
+    }
+
+    removeMsg = (index) => {
+	if (this.state.messageStack.length > index && index > -1)
+	{
+	    this.setState(previousState => ({messageStack: previousState.messageStack.filter((message, i) => {if (i !== index) {return message}})}));
+	}
+	
+    }
+
+    addMsg = (obj) => {
+	this.setState((oldState) => ({messageStack: [...oldState.messageStack, obj]}))
+    }
     
     // This functions toggles the popup 
-    togglePopup = () => {
-	this.setState(previousState => ({isPopup: !previousState.isPopup}));	
-    }
+    //togglePopup = () => {
+//	this.setState(previousState => ({isPopup: !previousState.isPopup}));	
+//    }
 
     // This function handles the checkboxes
     handleCheckbox = (uidArray, addRemoveFlag) => {
@@ -219,14 +251,22 @@ export default class Users extends React.Component {
     // This function calls the sitoo API lib that I wrote, and tries to load all users into state.
     // If the number of entries differ from the recived array, it tries again recursively. 
     loadUsersIntoState = (num) => {
-	sitooApi.getUsers(num).then(data => {if (data.status >= 200 && data.status < 300) {
-	    this.setState({dataLoaded: true,
-			   users: data.text.items,
+	sitooApi.getUsers(num).then(data => {
+	    if (data.status >= 200 && data.status < 300) {
+	    this.setState({users: data.text.items,
 			   userscount: data.text.totalcount});
-	}}).then(() => {
+	    }
+	    else {
+		helper.showAlert("Could not load users. Error " + data.status + " - " + data.text, this.addMsg);
+	    }
+	}).catch(err => {
+	    helper.showAlert("Could not load users. (Are you connected to the Internet?)", this.addMsg);
+	    console.error(err)
+	}).then(() => {
 	    if (this.state.users.length !== this.state.userscount) {
 		this.loadUsersIntoState(this.state.userscount); // Fetching exactly as many users as we need!
 	    } else {
+		this.setState({dataLoaded: true});
 		return;
 	    }});
     }
@@ -242,8 +282,8 @@ const DateEntry = (props) => {
 
     return(
 	<>
-	    <td className="usersTable date">{day}</td>
-	    <td className="usersTable time">{time}</td>
+	    <td key={props.keyTemplate + "day"} className="usersTable date">{day}</td>
+	    <td key={props.keyTemplate + "time"} className="usersTable time">{time}</td>
 	</>
     );
 }
@@ -259,19 +299,19 @@ const UserRow = (props) => {
 
     
     return(
-	<tr key={props.userid} className="usersTable">
-	    <td className="usersTable checkbox"><form><input type="checkbox" checked={props.checked.some(uid => {return props.userId === uid})} onChange={setparameters} /></form></td>
-	    <td className="usersTable name">{props.namefirst + " " + props.namelast}</td>
-	    <td className="usersTable email">{props.email}</td>
-	    <DateEntry date={props.datecreated} />
-	    <DateEntry date={props.datemodified} />
+	<tr key={props.userId} className="usersTable">
+	    <td key={props.userId + "checkbox"} className="usersTable checkbox"><form><input type="checkbox" checked={props.checked.some(uid => {return props.userId === uid})} onChange={setparameters} /></form></td>
+	    <td key={props.userId + "name"} className="usersTable name">{props.namefirst + " " + props.namelast}</td>
+	    <td key={props.userId + "email"} className="usersTable email">{props.email}</td>
+	    <DateEntry keyTemplate={props.userId + "created"} date={props.datecreated} />
+	    <DateEntry keyTemplate={props.userId + "modified"} date={props.datemodified} />
 	</tr>
     );
 }
 
 const UserRows = (props) => {
     
-    return(<tbody className="usersTable">
+    return(<tbody key='tablebody' className="usersTable">
 	       {props.users.map((userObj) => {
 		   return(
 		       <UserRow userId={userObj.userid} namefirst={userObj.namefirst} namelast={userObj.namelast} email={userObj.email} datecreated={userObj.datecreated} datemodified={userObj.datemodified} checkboxCallback={props.checkboxCallback} checked={props.checked}/>
@@ -297,11 +337,14 @@ const FuncButtons = (props) => {
     
 }
 
+// This one makes sure that the popups appear when buttons are called. They are 1-indexed, as index 0 denote popup closed. That's why I need to check loadedFunction-1.
 const InstalledPopups = (props) => {
     if (props.loadedFunction > 0) {
 	return React.createElement(props.functions[props.loadedFunction-1].funcName, { users: props.users,
 										       checkedUsers: props.checkedUsers,
-										       closeHandle: props.closeHandle,}, null);
+										       closeHandle: props.closeHandle,
+										       handleDataloading: props.handleDataloading,
+										       addMessage: props.addMessage,}, null);
     } else {
 	return "";
     }
@@ -309,7 +352,8 @@ const InstalledPopups = (props) => {
 
 // This function generates the buttons to select another page.
 const TableScrollButtons = (props) => {
-    let a = Array(props.numOfPages).fill(0);
+
+    let a = Array(props.numberOfPages).fill(0);
     return(
 	<div className="tableScrollButtons">
 	    <ul className="tableScrollButtons">
@@ -337,11 +381,6 @@ const TableScrollButtons = (props) => {
      *************************************************************************/
 
 
-const addUser = (props) => {
-    return(
-	<helper.popupForm title='Add User' content='This is content' closeHandle={props.closeHandle} />
-    );
-}
 
 const editUser = (props) => {
     return(

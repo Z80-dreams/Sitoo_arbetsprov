@@ -67,6 +67,8 @@ button.installedFunctions.red:hover {
     button.installedFunctions {
 	width: auto;
     }
+
+
 }
 
 /* Page scroll buttons below */
@@ -144,8 +146,8 @@ button.tableScrollButtons.selected {
 
 table.usersTable {
     width: 100%;
-    max-width: 70em;
-
+    margin-left: auto;
+    margin-right: auto;
 }
 
 th.usersTable {
@@ -171,4 +173,10 @@ td.usersTable.time {
     text-align: right;
 }
 
-
+@media only screen and (min-width: 768px) {
+    table.usersTable {
+	width: 70%;
+	
+    }
+	   
+}

@@ -67,7 +67,7 @@ class Window extends React.Component {
 		    </header>
 		    {this.NavBuilder()}
 		</div>
-		<main>
+		<main className='app-content'>
 		    <Suspense fallback={<div>Loading...</div>}>
 			{this.state.installedModules[this.state.loadedModule].module}
 		    </Suspense>

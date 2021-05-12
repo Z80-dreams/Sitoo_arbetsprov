@@ -3,6 +3,9 @@
    the table of users, the buttons, etc. 
 */
 
+body {
+    margin: 0;
+}
 
 .app-window {
     display: flex;
@@ -24,6 +27,7 @@
     height: 1.5em;
     margin: 0;
 }
+
 
 
 
@@ -96,5 +100,7 @@ button.main-navbar.selected {
     button.main-navbar {
 	width: max-content;
     }
+
+
 }
 

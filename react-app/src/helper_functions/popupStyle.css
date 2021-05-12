@@ -53,3 +53,57 @@
 	 
      }
  }
+
+ /* 
+    Style for the messages (info-message, error-message)
+*/
+ 
+ div.messages {
+     position: fixed;
+     top: 5vh;
+     left: 0;
+     width: 100%;
+     display: flex;
+     flex-direction: column;
+     flex-wrap: nowrap;
+     justify-content: center;
+ }
+
+ div.messageBox {
+     width: calc(100% - 1em - 0.6em);
+     border: solid 1px;
+     padding: 0.5em;
+     margin: 0.3em;
+     margin-left: auto;
+     margin-right: auto;
+     color: #fff;
+     border-radius: 1em;
+ }
+
+ button.messageCloseButton {
+     background-color: #FFFFFF00;
+     height: 2em;
+     width: 2em;
+     border: solid 0px #333;
+     float: right;
+     font-family: sans-serif;
+     font-weight: bold;
+ }
+
+ div.messageBox.alert {
+     background: #800;
+     border-color: #400;
+	 
+ }
+
+ div.messageBox.success {
+     background: #080;
+     border-color: #040;
+ }
+
+ @media only screen and (min-width: 768px) {
+     div.messageBox {
+	 width: calc(70% - 1em - 0.6em);
+     }
+ }
+ 

@@ -8,7 +8,7 @@ import $ from 'jquery';
 
 import './popupStyle.css'
 
-export {popupForm, showError, showSuccess};
+export {popupForm, showAlert, showSuccess, Messages};
 
 const popupForm = (props) => {
     return(
@@ -16,7 +16,7 @@ const popupForm = (props) => {
 	    <div className='popupBox'>
 		<button className='closeButton' onClick={props.closeHandle}>Close</button>
 		<h2>{props.title}</h2>
-		    <p>{props.content}</p>
+		{props.content}
 	    </div>
 	</div>
 	
@@ -25,6 +25,36 @@ const popupForm = (props) => {
     
 }
 
-const showError = (props) => {}
+const showAlert = (text, messageStackUpdater) => {
+    messageStackUpdater({messageType: 'alert',
+		       premessage: 'Warning! ',
+		       messageContent: text});
+}
 
-const showSuccess = (props) => {}
+const showSuccess = (text, messageStackUpdater) => {
+    messageStackUpdater({messageType: 'success',
+		       premessage: 'Note! ',
+		       messageContent: text});
+}
+
+
+const Messages = (props) => {
+    
+    if (props.messages.length > 0) {
+	
+	return(<div className='messages'>
+		   {props.messages.map((messageObj, i) => {
+		       return(
+			   <div key={i} className={'messageBox ' + messageObj.messageType}>
+			       
+			       <span className='messageBox'><strong>{messageObj.premessage}</strong>{messageObj.messageContent}</span>
+			       <button className='messageCloseButton' onClick={() => props.removeMsg(i)}>&times;</button>
+			   </div>);
+		   })}
+	       </div>
+
+	      );
+    } else {
+	return("");
+    }
+}

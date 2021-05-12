@@ -16,14 +16,15 @@ const btoa = require("btoa");
 const settings = require("../sitoo_settings.json");
 //==========================================================================================================
 
-const setUrl = () => settings.corsServer ? settings.corsUrl + ":" + settings.corsPort + "/" + settings.apiBaseUrl : settings.apiBaseUrl ; 
+const setUrl = () => settings.corsServer ? settings.corsUrl + ":" + settings.corsPort + "/" + settings.apiBaseUrl : settings.apiBaseUrl ;
+
 
 /* Base function for GET, PUT and POST, so that I don't have to write the error checking code for each type of user data */
 const httpGet = async function(urlstring) {
     let apiPromise = await fetch(urlstring, {method: 'GET',
 					     headers: {'Content-Type': 'application/json',
 						       'Accept': 'application/json',
-						       'Authorization': 'Basic ' + btoa(settings.apiId + ':' + settings.apiPsw),}});
+						       'Authorization': 'Basic ' + btoa(settings.apiId + ':' + settings.apiPsw),}}).catch();
     
     return await checkResponse(apiPromise);        
 }
@@ -58,6 +59,7 @@ const httpDelete = async function(urlstring) {
     return await checkResponse(apiPromise);
 }
 
+
 const checkResponse = async function(apiPromise) {
     let data
     if (apiPromise.status >= 200 && apiPromise.status < 300) {
@@ -71,6 +73,8 @@ const checkResponse = async function(apiPromise) {
     }
     return(data);     
 }
+
+
 
 /* Specific functions for each type of user data, so that I don't have to rembmer the URL */
 const getUser = async function(userid) {
