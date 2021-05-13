@@ -19,6 +19,7 @@ body {
 
 
 .app-header {
+    overflow: hidden;
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row;

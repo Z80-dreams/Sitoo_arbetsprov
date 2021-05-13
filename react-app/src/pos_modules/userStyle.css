@@ -16,6 +16,7 @@ ul.installedFunctions {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
+    overflow: hidden;
 }
 
 li.installedFunctions {
@@ -23,6 +24,8 @@ li.installedFunctions {
     margin: 0;
     list-style: none;
     width: 100vw;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 button.installedFunctions {
@@ -35,6 +38,7 @@ button.installedFunctions {
     width: 100%;
     border-radius: 10px;
     border-style: solid;
+    font-family: sans-serif;
 }
 
 button.installedFunctions.blue {

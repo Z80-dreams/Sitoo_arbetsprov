@@ -3,8 +3,7 @@
 */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import $ from 'jquery';
+
 
 import './popupStyle.css'
 
@@ -15,8 +14,8 @@ const popupForm = (props) => {
 	<div className='shadowBox hidden'>
 	    <div className='popupBox'>
 		<button className='closeButton' onClick={props.closeHandle}>Close</button>
-		<h2>{props.title}</h2>
-		{props.content}
+		<h2 className='popupBox'>{props.title}</h2>
+		<div className='popupBox content'>{props.content}</div>
 	    </div>
 	</div>
 	

@@ -8,17 +8,17 @@
    I will also try to write code for immutable date, and then only change 
    the data through the API.
 */
-import React, { Component, Suspense, lazy } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery'; 
 import logo from './site-logo.svg';
 import './main-style.css';
-import * as helper from './helper_functions/guiComponents.js';
+
 
 // Installed modules that lives in other files.
-const Users = lazy (() => import('./pos_modules/usersmodule.js'));
-const Vendors = lazy (() => import('./pos_modules/vendorsmodule.js'));
-const Products = lazy (() => import('./pos_modules/productsmodule.js'));
+const Users = React.lazy (() => import('./pos_modules/usersmodule.js'));
+const Vendors = React.lazy (() => import('./pos_modules/vendorsmodule.js'));
+const Products = React.lazy (() => import('./pos_modules/productsmodule.js'));
 
 
 /* 
@@ -58,7 +58,7 @@ class Window extends React.Component {
     }
 
     render() {
-	let mainContent = [this.state.installedModules[this.state.loadedModule].module];
+
 	return(
 	    <div className='app-window'>
 		<div className="topstuff">
@@ -68,9 +68,9 @@ class Window extends React.Component {
 		    {this.NavBuilder()}
 		</div>
 		<main className='app-content'>
-		    <Suspense fallback={<div>Loading...</div>}>
+		    <React.Suspense fallback={<div>Loading...</div>}>
 			{this.state.installedModules[this.state.loadedModule].module}
-		    </Suspense>
+		    </React.Suspense>
 		</main>
 	    </div>
 	); 

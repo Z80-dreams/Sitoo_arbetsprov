@@ -8,13 +8,14 @@
 */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import $ from 'jquery';
 
 // Home made helper libraries
 import * as helper from './../helper_functions/guiComponents.js';
 import * as sitooApi from './../helper_functions/sitooLib.js';
 import addUser from './addUser.js';
+import editUser from './editUser.js';
+import deleteUsers from './deleteUsers.js';
 import './userStyle.css';
 
 export default class Users extends React.Component {
@@ -32,13 +33,14 @@ export default class Users extends React.Component {
 			      buttonColor: 'red',}], // Make sure functions exists below, outside of Class. 
 	    loadedFunction: 0, // 0 means none loaded.
 	    users: [],
-	    userscount: 0, //0 until the load function run. That will get the "totalcount" from API, and compare to length of users array.
+	    userscount: 100, // 100 until the load function run. That will get the "totalcount" from API, and compare to length of users array. 
 	    dataLoaded: false,
 	    currentPage: 1,
 	    numberOfPages: 1, // Set to 1 initially, then change state once all entries has been loaded from the API, and the actual length is known.
 	    usersPerPage: 1,
 	    checkedUsers: [],
 	    messageStack: [],
+	    initMessage: 'Loading users from remote source.',
 
 
 	    
@@ -52,16 +54,10 @@ export default class Users extends React.Component {
     }
 
 
-    componentDidMount() {
-	// Trying to fetch users. Starging at 100, and increasing if it's not enough.
-	let startvalue = 100;
-	this.loadUsersIntoState(startvalue);
-	
+    componentDidMount() {	
 	// This is to select the first button on startup.
 	this.changePage(1);
-	
-	//helper.showSuccess("Testing a green box!", this.addMsg);
-	//helper.showAlert("Testing a red box!", this.addMsg);
+
 	
     }
 
@@ -76,9 +72,11 @@ export default class Users extends React.Component {
 	this.checkNumberOfPages();
 
 	// If we notice that data loaded-flag is set to false, we try to reload the last known users count.
-	if(!this.state.dataLoaded)
+	if(!this.state.dataLoaded) {
+	    this.setState({dataLoaded: true});
 	    this.loadUsersIntoState(this.state.userscount);
 	    
+	}
 
 	
 	// Uncomment below to get data about rendering times. Don't forget to uncomment array renderTime in state. 
@@ -143,8 +141,7 @@ export default class Users extends React.Component {
 	else {
 	    return (
 		<>
-		    Trying to connect for 5 minutes in Chrome, 1.5 minutes in Firefox.<br/>
-		    <strong>Loading Users Data...</strong>
+		    <strong>{this.state.initMessage}</strong>
 		</>
 	    );
 	}
@@ -152,7 +149,9 @@ export default class Users extends React.Component {
 
     /*************************************************************************
      *                                                                       *
-     *         RENDER FUNCTION ENDS HERE...                                *
+     *         RENDER FUNCTION ENDS HERE...                                  *
+     *                                                                       *
+     *         NOW STARTS METHODS FOR HANDLING THE TABLE OF USERS...         *
      *                                                                       *
      *************************************************************************/
 
@@ -200,26 +199,21 @@ export default class Users extends React.Component {
 			  });
     }
 
-    removeMsg = (index) => {
-	if (this.state.messageStack.length > index && index > -1)
-	{
-	    this.setState(previousState => ({messageStack: previousState.messageStack.filter((message, i) => {if (i !== index) {return message}})}));
+    // This function changes the page currently viewed in the table. Number of pages is based on how many entries exists, and how many fit in one page.
+    changePage = (p) => {
+	if (p<1) {
+	    this.setState({currentPage: 1});
 	}
-	
+	else if (p>this.state.numberOfPages) {
+	    this.setState({currentPage: this.state.numberOfPages});
+	}
+	else {
+	    this.setState({currentPage: p});
+	}
     }
-
-    addMsg = (obj) => {
-	this.setState((oldState) => ({messageStack: [...oldState.messageStack, obj]}))
-    }
-    
-    // This functions toggles the popup 
-    //togglePopup = () => {
-//	this.setState(previousState => ({isPopup: !previousState.isPopup}));	
-//    }
 
     // This function handles the checkboxes
     handleCheckbox = (uidArray, addRemoveFlag) => {
-	console.log('user id is ' + uidArray + " flag is set to " + addRemoveFlag);
 	if(addRemoveFlag === 'add') {
 	    this.setState(previousState => {
 		return({checkedUsers: [...previousState.checkedUsers, ...uidArray]}); // Use spread operator
@@ -234,30 +228,54 @@ export default class Users extends React.Component {
 	}
     }
 
+    /*************************************************************************
+     *                                                                       *
+     *         TABLE METHODS END HERE...                                     *
+     *                                                                       *
+     *         NOW STARTS METHODS FOR HANDLING MESSAGES...                   *
+     *                                                                       *
+     *************************************************************************/
 
-    // This function changes the page currently viewed in the table. Number of pages is based on how many entries exists, and how many fit in one page.
-    changePage = (p) => {
-	if (p<1) {
-	    this.setState({currentPage: 1});
+    removeMsg = (index) => {
+	if (this.state.messageStack.length > index && index > -1)
+	{
+	    this.setState(previousState => ({messageStack: previousState.messageStack.filter((message, i) => {if (i !== index) {return message} else {return false}})}));
 	}
-	else if (p>this.state.numberOfPages) {
-	    this.setState({currentPage: this.state.numberOfPages});
-	}
-	else {
-	    this.setState({currentPage: p});
-	}
+	
     }
+
+    addMsg = (obj) => {
+	this.setState((oldState) => ({messageStack: [...oldState.messageStack, obj]}))
+    }
+    
+
+
+    /*************************************************************************
+     *                                                                       *
+     *         MESSAGE METHODS END HERE...                                   *
+     *                                                                       *
+     *         NOW STARTS METHOD FOR HANDLING DATA LOADING...                *
+     *                                                                       *
+     *************************************************************************/
+
+
 
     // This function calls the sitoo API lib that I wrote, and tries to load all users into state.
     // If the number of entries differ from the recived array, it tries again recursively. 
     loadUsersIntoState = (num) => {
 	sitooApi.getUsers(num).then(data => {
 	    if (data.status >= 200 && data.status < 300) {
-	    this.setState({users: data.text.items,
-			   userscount: data.text.totalcount});
+		// I initially wanted to sort all the names in alphabetical order here, but I noticed that
+		// the loading time of the page increased significant. I therefore dropped the array sort
+		// in faviour of faster loading of the user table.
+		
+		this.setState({
+		    users: data.text.items,
+		    userscount: data.text.totalcount,
+		});
 	    }
 	    else {
-		helper.showAlert("Could not load users. Error " + data.status + " - " + data.text, this.addMsg);
+		helper.showAlert("Could not load users. Error " + data.status + " - " + data.text.message, this.addMsg);
 	    }
 	}).catch(err => {
 	    helper.showAlert("Could not load users. (Are you connected to the Internet?)", this.addMsg);
@@ -266,14 +284,63 @@ export default class Users extends React.Component {
 	    if (this.state.users.length !== this.state.userscount) {
 		this.loadUsersIntoState(this.state.userscount); // Fetching exactly as many users as we need!
 	    } else {
-		this.setState({dataLoaded: true});
 		return;
 	    }});
     }
 
 }
 
-// Due to javaScript delayed execution, I try to use function expressions rather than function declaration whenever I can, this lower the memory usage.
+    /*************************************************************************
+     *                                                                       *
+     *         CLASS USERS END HERE                                          *
+     *                                                                       *
+     *         NOW STARTS FUNCTIONS OUTSIDE OF CLASS DEFINITON               *
+     *                                                                       *
+     *         Due to JavaScript delayed execurion, I try to use function    *
+     *         expressions rather than function declarations whenever I      *
+     *         can, this lowers the memory usage.                            *
+     *                                                                       *  
+     *************************************************************************/
+
+
+    /*************************************************************************
+     *                                                                       *
+     *         FUNCTIONS TO DRAW THE TALBE OF USERS STARTS HERE...           *
+     *                                                                       *
+     *************************************************************************/
+
+const UserRows = (props) => {
+    
+    return(<tbody key='tablebody' className="usersTable">
+	       {props.users.map((userObj) => {
+		   return(
+		       <UserRow key={userObj.userid} userId={userObj.userid} namefirst={userObj.namefirst} namelast={userObj.namelast} email={userObj.email} datecreated={userObj.datecreated} datemodified={userObj.datemodified} checkboxCallback={props.checkboxCallback} checked={props.checked}/>
+		   )})}
+	   </tbody>
+	  ); 
+}
+
+
+const UserRow = (props) => {
+    let setparameters = () => {
+	if(props.checked.some(uid => {return props.userId === uid})) {
+	    props.checkboxCallback([props.userId], 'remove');
+	} else {
+	    props.checkboxCallback([props.userId], 'add');
+	}
+    }
+
+    
+    return(
+	<tr key={props.userId} className="usersTable">
+	    <td key={props.userId + "checkbox"} className="usersTable checkbox"><form><input key={props.userId + "checkbox"} type="checkbox" checked={props.checked.some(uid => {return props.userId === uid})} onChange={setparameters} /></form></td>
+	    <td key={props.userId + "name"} className="usersTable name">{props.namefirst + " " + props.namelast}</td>
+	    <td key={props.userId + "email"} className="usersTable email">{props.email}</td>
+	    <DateEntry keyTemplate={props.userId + "created"} date={props.datecreated} />
+	    <DateEntry keyTemplate={props.userId + "modified"} date={props.datemodified} />
+	</tr>
+    );
+}
 
 const DateEntry = (props) => {
     let date = new Date(props.date*1000);
@@ -288,37 +355,37 @@ const DateEntry = (props) => {
     );
 }
 
-const UserRow = (props) => {
-    let setparameters = () => {
-	if(props.checked.some(uid => {return props.userId === uid})) {
-	    props.checkboxCallback([props.userId], 'remove');
-	} else {
-	    props.checkboxCallback([props.userId], 'add');
-	}
-    }
+// This function generates the buttons to select another page in the table.
+const TableScrollButtons = (props) => {
 
-    
+    let a = Array(props.numberOfPages).fill(0);
     return(
-	<tr key={props.userId} className="usersTable">
-	    <td key={props.userId + "checkbox"} className="usersTable checkbox"><form><input type="checkbox" checked={props.checked.some(uid => {return props.userId === uid})} onChange={setparameters} /></form></td>
-	    <td key={props.userId + "name"} className="usersTable name">{props.namefirst + " " + props.namelast}</td>
-	    <td key={props.userId + "email"} className="usersTable email">{props.email}</td>
-	    <DateEntry keyTemplate={props.userId + "created"} date={props.datecreated} />
-	    <DateEntry keyTemplate={props.userId + "modified"} date={props.datemodified} />
-	</tr>
+	<div className="tableScrollButtons">
+	    <ul className="tableScrollButtons">
+		<li key="left" className="tableScrollButtons left"><button className="tableScrollButtons left" onClick={() => props.callbackFunc(props.currentPage-1)}>&lt;&lt;</button></li>
+		{a.map((a, i) => {return(
+		    <li key={i+1}className={"tableScrollButtons " + (i + 1)}>
+			<button className={"tableScrollButtons " + (i + 1)} onClick={() => props.callbackFunc(i+1)}>
+			    {i+1}
+			</button>
+		    </li>)})}
+		<li key={"right"} className="tableScrollButtons right"><button className="tableScrollButtons right" onClick={() => props.callbackFunc(props.currentPage+1)}>&gt;&gt;</button></li>
+		
+	    </ul>
+	    
+	</div>
     );
+
 }
 
-const UserRows = (props) => {
-    
-    return(<tbody key='tablebody' className="usersTable">
-	       {props.users.map((userObj) => {
-		   return(
-		       <UserRow userId={userObj.userid} namefirst={userObj.namefirst} namelast={userObj.namelast} email={userObj.email} datecreated={userObj.datecreated} datemodified={userObj.datemodified} checkboxCallback={props.checkboxCallback} checked={props.checked}/>
-		   )})}
-	   </tbody>
-	  ); 
-}
+    /*************************************************************************
+     *                                                                       *
+     *         FUNCTIONS TO DRAW THE TALBE OF USERS ENDS HERE...             *
+     *                                                                       *
+     *         NOW STARTS FUNCTIONS TO HANDLE PLUGINS.                       *
+     *         I.E. ADD USER, EDIT USER AND DELETE USERS.                    *
+     *                                                                       *
+     *************************************************************************/
 
 // This function generates the "toolbox" at the bottom.
 const FuncButtons = (props) => {
@@ -350,47 +417,7 @@ const InstalledPopups = (props) => {
     }
 }
 
-// This function generates the buttons to select another page.
-const TableScrollButtons = (props) => {
-
-    let a = Array(props.numberOfPages).fill(0);
-    return(
-	<div className="tableScrollButtons">
-	    <ul className="tableScrollButtons">
-		<li key="left" className="tableScrollButtons left"><button className="tableScrollButtons left" onClick={() => props.callbackFunc(props.currentPage-1)}>&lt;&lt;</button></li>
-		{a.map((a, i) => {return(
-		    <li key={i+1}className={"tableScrollButtons " + (i + 1)}>
-			<button className={"tableScrollButtons " + (i + 1)} onClick={() => props.callbackFunc(i+1)}>
-			    {i+1}
-			</button>
-		    </li>)})}
-		<li key={"right"} className="tableScrollButtons right"><button className="tableScrollButtons right" onClick={() => props.callbackFunc(props.currentPage+1)}>&gt;&gt;</button></li>
-		
-	    </ul>
-	    
-	</div>
-    );
-
-}
-
-    /*************************************************************************
-     *                                                                       *
-     *   Here starts additionally installed "functions" to the user module   *
-     *   They could also be improted from separate file but I put them here  *
-     *                                                                       *
-     *************************************************************************/
 
 
 
-const editUser = (props) => {
-    return(
-	<helper.popupForm title='Edit User' content='This is content' closeHandle={props.closeHandle} />
-    );
-}
-
-const deleteUsers = (props) => {
-    return(
-	<helper.popupForm title='Delete Users' content='This is content' closeHandle={props.closeHandle} />
-    );
-}
 

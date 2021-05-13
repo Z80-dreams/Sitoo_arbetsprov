@@ -11,20 +11,27 @@ import * as sitooApi from './../helper_functions/sitooLib.js';
 
 
 
-const addUser = (props) => {
+const editUser = (props) => {
+    
     let tempUser = {};
 
+    if (props.checkedUsers.length === 1) {
+	tempUser = Object.assign(tempUser, props.users.filter(userObj => userObj.userid === props.checkedUsers[0])[0]);
+	delete tempUser.datecreated;
+	delete tempUser.datemodified;
+    }
 
     const form = () => {
+	
 	return(
 	    <>
 		<form className='popupForm'>
 		    <label htmlFor='namefirst' className='popupForm'>First name</label><br/>
-		    <input type='text' id='namefirst' className='popupForm' onChange={() => {tempUser.namefirst = $('#namefirst').val()}} /><br/>
+		    <input type='text' id='namefirst' className='popupForm' defaultValue={tempUser.namefirst} onChange={() => {tempUser.namefirst = $('#namefirst').val()}} /><br/>
 		    <label htmlFor='namelast' className='popupForm'>Last name</label><br/>
-		    <input type='text' id='namelast' className='popupForm' onChange={() => {tempUser.namelast = $('#namelast').val()}} /><br/>
+		    <input type='text' id='namelast' className='popupForm' defaultValue={tempUser.namelast} onChange={() => {tempUser.namelast = $('#namelast').val()}} /><br/>
 		    <label htmlFor='email' className='popupForm'>Email</label><br/>
-		    <input type='text' id='email' className='popupForm'  onChange={() => {tempUser.email = $('#email').val()}}/><br/>
+		    <input type='text' id='email' className='popupForm' defaultValue={tempUser.email} onChange={() => {tempUser.email = $('#email').val()}}/><br/>
 		</form>
 		<div className='formButtons'>
 		    <button className='popupForm cancel' onClick={props.closeHandle}>Cancel</button>
@@ -34,9 +41,7 @@ const addUser = (props) => {
 	);
     }
 
-
-
-
+    
     const checkData = () => {
 	// Checking both names and email using regular expressions.
 
@@ -58,12 +63,15 @@ const addUser = (props) => {
 	}
 	else if (!emailCheck) {
 	    helper.showAlert("That's not a valid email address!", props.addMessage);
+
 	}
 	else if (!firstnameCheck) {
 	    helper.showAlert("Only letters, spaces and dash is allowed in the first name, and it cannot be empty!", props.addMessage);
+
 	}
 	else if (!lastnameCheck) {
 	    helper.showAlert("Only letters, spaces and dash is allowed in the last name, and it cannot be empty!", props.addMessage);
+
 	}
 	else {
 	    console.log("Something that shouldn't happen, happened!");
@@ -72,24 +80,24 @@ const addUser = (props) => {
     }
 
     const submitData = (userObj) => {
-	sitooApi.addUsers([userObj]).then(response => {
+	sitooApi.updateUsers([userObj]).then(response => {
 
 	    if (response.status >= 200 && response.status < 300) {
 		if (response.text[0].statuscode >= 200 && response.text[0].statuscode < 300) {
-		    helper.showSuccess("User added!", props.addMessage);
+		    helper.showSuccess("User updated!", props.addMessage);
 		    props.handleDataloading();
 		    props.closeHandle();
 		}
 		else {
-		    helper.showAlert("Could not add user. " + response.text[0].errortext, props.addMessage);
+		    helper.showAlert("Could not update user. " + response.text[0].errortext, props.addMessage);
 		}
 		
 	    }
 	    else {
-		helper.showAlert(response.status + " - " + response.text + " (Are you connected to the Internet?)", props.addMessage);
+		helper.showAlert(response.status + " - " + response.text.message + " (Are you connected to the Internet?)", props.addMessage);
 	    }
 	}).catch(err => {
-	    helper.showAlert("Could not add user. (Are you connected to the Internet?)", props.addMessage);
+	    helper.showAlert("Could not update user. (Are you connected to the Internet?)", props.addMessage);
 	    console.error(err);
 	    props.handleDataloading();
 	    props.closeHandle();
@@ -98,10 +106,24 @@ const addUser = (props) => {
     }
 
     /* =================================================================== */
-
-    return(
-	<helper.popupForm title='Add User' content={form()} closeHandle={props.closeHandle} outerProps={props} />
-    );      
+    if (props.checkedUsers.length < 1) {
+	return(
+	    <helper.popupForm title='Edit User' content={<p>You must select at least one user to edit.</p>} closeHandle={props.closeHandle} outerProps={props} />
+	);
+    }
+    else if (props.checkedUsers.length > 1) {
+	return(
+	<helper.popupForm title='Edit User' content={<p className='popupBox'>You can only edit one user at a time.</p>} closeHandle={props.closeHandle} outerProps={props} />
+	);
+    }
+    else if (props.checkedUsers.length === 1) {
+	return(
+	    <helper.popupForm title='Edit User' content={form()} closeHandle={props.closeHandle} outerProps={props} />
+    );
+    }
+    else {
+	console.log("How did I get here?");
+    }
 }
 
-export default addUser;
+export default editUser;
