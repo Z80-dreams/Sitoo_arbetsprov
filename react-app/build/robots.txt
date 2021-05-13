@@ -1,0 +1,4 @@
+# As this is a POS system, we don't want to allow any web-robots/crawlers.
+# Disallow all robots. 
+User-agent: *
+Disallow: /

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Sitoo POS - Edit user data"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json has lots of information that is used when the react web
+      page is installed as an app on android devices, like in a self-checkout
+      system (Lagerhouse). 
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>Sitoo POS - Edit Users</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this POS system.</noscript>
+    <div id="root"></div>
+    <!--
+	All the body content is added by the javascript.
+    -->
+  </body>
+</html>

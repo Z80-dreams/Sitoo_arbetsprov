@@ -1,0 +1,2 @@
+(this["webpackJsonpreact-app"]=this["webpackJsonpreact-app"]||[]).push([[6],{30:function(t,e,n){"use strict";n.r(e),n.d(e,"default",(function(){return p}));var r=n(4),a=n(5),c=n(7),s=n(6),u=n(1),i=n.n(u),o=(n(8),n(0)),p=function(t){Object(c.a)(n,t);var e=Object(s.a)(n);function n(t){return Object(r.a)(this,n),e.call(this,t)}return Object(a.a)(n,[{key:"render",value:function(){return Object(o.jsx)("div",{className:"test-div-users",children:"Foo Vendors!"})}}]),n}(i.a.Component)}}]);
+//# sourceMappingURL=6.f5bca781.chunk.js.map
